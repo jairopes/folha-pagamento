@@ -2,6 +2,7 @@
 export interface Employee {
   id: string;
   name: string;
+  company: string; // Nova propriedade
   role: string;
   registrationDate: string; // Data de criação no sistema
   

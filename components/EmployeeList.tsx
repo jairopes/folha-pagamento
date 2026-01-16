@@ -16,6 +16,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onAdd, onUpdate,
   
   const [formData, setFormData] = useState({
     name: '',
+    company: '',
     role: '',
     admissionDate: new Date().toISOString().split('T')[0],
     exitDate: '',
@@ -38,11 +39,12 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onAdd, onUpdate,
     return employees.filter(emp => 
       emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       emp.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      emp.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       emp.cpf.includes(searchTerm)
     );
   }, [employees, searchTerm]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -75,6 +77,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onAdd, onUpdate,
     setEditingEmployeeId(employee.id);
     setFormData({
       name: employee.name,
+      company: employee.company || '',
       role: employee.role,
       admissionDate: employee.admissionDate,
       exitDate: employee.exitDate || '',
@@ -101,6 +104,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onAdd, onUpdate,
     setEditingEmployeeId(null);
     setFormData({
       name: '',
+      company: '',
       role: '',
       admissionDate: new Date().toISOString().split('T')[0],
       exitDate: '',
@@ -127,6 +131,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onAdd, onUpdate,
     const employeeData: Employee = {
       id: editingEmployeeId || Date.now().toString(),
       name: formData.name,
+      company: formData.company,
       role: formData.role || 'Funcionário',
       registrationDate: editingEmployeeId ? (employees.find(e => e.id === editingEmployeeId)?.registrationDate || new Date().toISOString()) : new Date().toISOString(),
       admissionDate: formData.admissionDate,
@@ -185,7 +190,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onAdd, onUpdate,
           </div>
           <input
             type="text"
-            placeholder="Pesquisar funcionário por nome, cargo ou CPF..."
+            placeholder="Pesquisar funcionário por nome, cargo, empresa ou CPF..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-slate-900 border border-slate-800 rounded-2xl py-4 pl-12 pr-4 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all shadow-xl"
@@ -222,7 +227,7 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onAdd, onUpdate,
             <section className="space-y-4">
               <h4 className={`text-xs font-black uppercase tracking-widest text-slate-500 border-l-2 ${editingEmployeeId ? 'border-blue-500' : 'border-emerald-500'} pl-3`}>Identificação e Contrato</h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2">
+                <div className="md:col-span-1">
                   <label className="block text-sm font-medium text-slate-400 mb-1">Nome Completo</label>
                   <input
                     autoFocus
@@ -234,6 +239,20 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onAdd, onUpdate,
                     className="w-full bg-black text-white border border-slate-700 rounded-xl p-3 focus:ring-2 focus:ring-emerald-500 outline-none"
                     required
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-1">Empresa</label>
+                  <select
+                    name="company"
+                    value={formData.company}
+                    onChange={handleInputChange}
+                    className="w-full bg-black text-white border border-slate-700 rounded-xl p-3 focus:ring-2 focus:ring-emerald-500 outline-none h-[52px]"
+                    required
+                  >
+                    <option value="">Selecione a Empresa</option>
+                    <option value="CAMPLUVAS">CAMPLUVAS</option>
+                    <option value="LOCATEX">LOCATEX</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-400 mb-1">Função / Cargo</label>
@@ -505,7 +524,10 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ employees, onAdd, onUpdate,
               
               <div className="mb-4">
                 <h4 className="text-xl font-bold group-hover:text-emerald-400 transition-colors leading-tight truncate" title={employee.name}>{employee.name}</h4>
-                <p className="text-emerald-500/70 text-sm font-semibold uppercase tracking-wider mt-1">{employee.role}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="px-2 py-0.5 bg-slate-800 text-slate-400 text-[10px] font-black rounded uppercase tracking-tighter border border-slate-700">{employee.company || 'N/A'}</span>
+                  <p className="text-emerald-500/70 text-sm font-semibold uppercase tracking-wider">{employee.role}</p>
+                </div>
               </div>
 
               <div className="space-y-3 flex-1">
